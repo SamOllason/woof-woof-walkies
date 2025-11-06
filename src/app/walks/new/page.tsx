@@ -1,16 +1,33 @@
 import AddWalkForm from '@/components/AddWalkForm'
 import type { CreateWalkInput } from '@/types/walk'
+import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
 
 export default function NewWalkPage() {
-  // This will be a Server Action when we connect Supabase
   const handleSubmit = async (walkData: CreateWalkInput) => {
     'use server'
     
-    // TODO: Save to Supabase when connected
-    console.log('Walk data to save:', walkData)
+    const supabase = await createClient()
     
-    // For now, just log it
-    // Later: await supabase.from('walks').insert(walkData)
+    // Insert the walk with null user_id (temporary for testing)
+    const { data, error } = await supabase
+      .from('walks')
+      .insert({
+        ...walkData,
+        user_id: null,
+      })
+      .select()
+      .single()
+    
+    if (error) {
+      console.error('Error saving walk:', error)
+      throw new Error('Failed to save walk: ' + error.message)
+    }
+    
+    console.log('Walk saved successfully:', data)
+    
+    // Redirect to home for now
+    redirect('/')
   }
 
   return (

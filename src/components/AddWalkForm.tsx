@@ -71,7 +71,7 @@ export default function AddWalkForm({ onSubmit, isSubmitting = false }: AddWalkF
           id="name"
           value={formData.name}
           onChange={(e) => handleChange('name', e.target.value)}
-          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-500 text-gray-900 ${
             errors.name ? 'border-red-500' : 'border-gray-300'
           }`}
           placeholder="e.g., Riverside Loop"
@@ -98,7 +98,7 @@ export default function AddWalkForm({ onSubmit, isSubmitting = false }: AddWalkF
           onChange={(e) => handleChange('distance_km', parseFloat(e.target.value) || 0)}
           step="0.1"
           min="0"
-          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-500 text-gray-900 ${
             errors.distance_km ? 'border-red-500' : 'border-gray-300'
           }`}
           placeholder="e.g., 3.5"
@@ -125,7 +125,7 @@ export default function AddWalkForm({ onSubmit, isSubmitting = false }: AddWalkF
           onChange={(e) => handleChange('duration_minutes', parseInt(e.target.value) || 0)}
           step="5"
           min="0"
-          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-500 text-gray-900 ${
             errors.duration_minutes ? 'border-red-500' : 'border-gray-300'
           }`}
           placeholder="e.g., 45"
@@ -149,7 +149,7 @@ export default function AddWalkForm({ onSubmit, isSubmitting = false }: AddWalkF
           id="difficulty"
           value={formData.difficulty}
           onChange={(e) => handleChange('difficulty', e.target.value as DifficultyLevel)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
           disabled={isSubmitting}
         >
           <option value="easy">Easy</option>
@@ -168,7 +168,7 @@ export default function AddWalkForm({ onSubmit, isSubmitting = false }: AddWalkF
           value={formData.notes}
           onChange={(e) => handleChange('notes', e.target.value)}
           rows={4}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-500 text-gray-900"
           placeholder="Any additional details about this walk..."
           disabled={isSubmitting}
         />
