@@ -6,9 +6,9 @@ import { redirect } from 'next/navigation'
 export default function NewWalkPage() {
   const handleSubmit = async (walkData: CreateWalkInput) => {
     'use server'
-    
+
     const supabase = await createClient()
-    
+
     // Insert the walk with null user_id (temporary for testing)
     const { data, error } = await supabase
       .from('walks')
@@ -18,14 +18,14 @@ export default function NewWalkPage() {
       })
       .select()
       .single()
-    
+
     if (error) {
       console.error('Error saving walk:', error)
       throw new Error('Failed to save walk: ' + error.message)
     }
-    
+
     console.log('Walk saved successfully:', data)
-    
+
     // Redirect to home for now
     redirect('/')
   }
