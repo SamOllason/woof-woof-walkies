@@ -142,10 +142,13 @@ describe('WalksList', () => {
       const deleteButton = screen.getByRole('button', { name: /delete/i })
       await user.click(deleteButton)
       
-      // Should show empty state
+      // Walk should be removed immediately (optimistic)
       await waitFor(() => {
-        expect(screen.getByText('No walks yet')).toBeInTheDocument()
+        expect(screen.queryByText('Morning Walk')).not.toBeInTheDocument()
       })
+      
+      // Should show empty state
+      expect(screen.getByText('No walks yet')).toBeInTheDocument()
     })
   })
 })

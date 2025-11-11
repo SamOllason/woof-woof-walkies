@@ -44,78 +44,38 @@ Development plan for Woof Woof Walkies - prioritized by learning value and emplo
 - [x] Responsive Header component with mobile menu
 - [x] Route groups for authenticated vs auth pages
 
+### Phase 4: Edit & Delete Walks (Complete CRUD)
+- [x] Edit button on each WalkCard
+- [x] Delete button on each WalkCard
+- [x] Edit walk page with pre-populated form
+- [x] Update Server Action with redirect handling
+- [x] EditWalkForm component (14 tests)
+- [x] Delete confirmation dialog
+- [x] Delete Server Action in separate actions file
+- [x] **Optimistic UI updates with React's useOptimistic hook**
+- [x] **WalksList client component for optimistic state management**
+- [x] **Success/error toast notifications (react-hot-toast)**
+- [x] **Visual pending states during delete operations**
+- [x] **Automatic rollback on server errors**
+- [x] Comprehensive tests for optimistic behavior (130+ tests passing)
+- [x] Documented as portfolio-worthy feature in specification
+
+### Phase 5: Search & Filter
+- [x] SearchFilters client component with debounced search input
+- [x] Filter by walk name (case-insensitive search)
+- [x] Filter by difficulty (dropdown)
+- [x] Filter by distance range (min/max inputs)
+- [x] URL search params for shareable filter links
+- [x] Server-side filtering with Supabase (.ilike, .eq, .gte, .lte)
+- [x] Clear filters button
+- [x] Result count display
+- [x] Responsive filter layout
+- [x] Comprehensive tests for filter behavior
+- [x] Multiple filters combined in URL
+
 ---
 
 ## 🎯 Priority Roadmap
-
-### Phase 4: Edit & Delete Walks (Complete CRUD) ✏️
-**Goal:** Full CRUD operations (Create, Read, Update, Delete)  
-**Time estimate:** 1-2 hours  
-**Employability impact:** ⭐⭐⭐⭐
-
-**Features:**
-- [x] Edit button on each WalkCard
-- [x] Delete button on each WalkCard
-- [x] Tests for edit/delete buttons (3 passing tests)
-- [x] Edit walk page (form pre-populated)
-- [x] Update Server Action (with redirect fix)
-- [x] EditWalkForm component (14 passing tests)
-- [x] Form validation and error handling
-- [x] Consistent styling with AddWalkForm
-- [ ] Delete confirmation dialog
-- [ ] Delete Server Action
-- [ ] Optimistic UI updates (update UI before server responds)
-- [ ] Success/error toast notifications
-
-**Why this matters:**
-- CRUD is fundamental to all applications
-- Shows you understand the full data lifecycle
-- Optimistic updates demonstrate advanced UX patterns
-- Form state management is a key skill
-
-**Skills learned:**
-- UPDATE and DELETE SQL operations
-- Form pre-population techniques
-- Confirmation dialogs
-- Optimistic UI patterns
-- Error handling and rollback
-- Toast notifications
-
----
-
-### Phase 5: Search & Filter 🔍
-**Goal:** Advanced data filtering with good UX  
-**Time estimate:** 2 hours  
-**Employability impact:** ⭐⭐⭐⭐
-
-**Features:**
-- [ ] Search input (by walk name)
-- [ ] Filter by difficulty (easy/moderate/hard)
-- [ ] Filter by distance range
-- [ ] Debounced search (don't search on every keystroke)
-- [ ] URL search params (shareable filtered links)
-- [ ] Server-side filtering with Supabase queries
-- [ ] "Clear filters" button
-- [ ] Filter result count display
-- [ ] Tests for filtering logic
-
-**Why this matters:**
-- Search/filter is in most applications
-- Shows you understand UX (debouncing, URL state)
-- Demonstrates performance considerations
-- URL state management is a valuable pattern
-
-**Skills learned:**
-- Debouncing techniques
-- URL search params in Next.js
-- Server-side filtering with SQL
-- Multiple filter combination logic
-- React state management patterns
-- Performance optimization
-
----
-
-## 🚀 Nice-to-Have Features (After Core Features)
 
 ### Phase 6: File Upload (Walk Photos) 📸
 **Time estimate:** 2-3 hours  

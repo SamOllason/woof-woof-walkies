@@ -1,6 +1,6 @@
 'use client'
 
-import { useOptimistic } from 'react'
+import { useState, useOptimistic, useTransition, useEffect } from 'react'
 import toast from 'react-hot-toast'
 import { WalkCard } from './WalkCard'
 import type { Walk } from '@/types/walk'
@@ -11,26 +11,37 @@ interface WalksListProps {
 }
 
 export function WalksList({ initialWalks, onDelete }: WalksListProps) {
+  const [walks, setWalks] = useState(initialWalks)
   const [optimisticWalks, removeOptimisticWalk] = useOptimistic(
-    initialWalks,
+    walks,
     (currentWalks, walkIdToDelete: string) => {
       return currentWalks.filter(walk => walk.id !== walkIdToDelete)
     }
   )
+  const [_, startTransition] = useTransition()
+
+  // Sync state when initialWalks changes (e.g., when filters are applied)
+  useEffect(() => {
+    setWalks(initialWalks)
+  }, [initialWalks])
 
   async function handleDelete(walkId: string) {
-    // Optimistically remove the walk from UI immediately
-    removeOptimisticWalk(walkId)
-    
-    try {
-      // Make actual server request in background
-      await onDelete(walkId)
-      toast.success('Walk deleted successfully')
-    } catch (error) {
-      // React automatically reverts the optimistic update on error
-      toast.error('Failed to delete walk. Please try again.')
-      console.error('Failed to delete walk:', error)
-    }
+    startTransition(async () => {
+      // Optimistically remove the walk from UI immediately
+      removeOptimisticWalk(walkId)
+      
+      try {
+        // Make actual server request in background
+        await onDelete(walkId)
+        // If successful, update the actual state
+        setWalks(walks.filter(walk => walk.id !== walkId))
+        toast.success('Walk deleted successfully')
+      } catch (error) {
+        // React automatically reverts optimistic update, just show error
+        toast.error('Failed to delete walk. Please try again.')
+        console.error('Failed to delete walk:', error)
+      }
+    })
   }
 
   return (
