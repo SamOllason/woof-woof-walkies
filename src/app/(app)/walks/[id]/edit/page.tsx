@@ -1,4 +1,5 @@
 import { redirect, notFound } from 'next/navigation'
+import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { EditWalkForm } from '@/components/EditWalkForm'
 
@@ -63,6 +64,10 @@ export default async function EditWalkPage({ params }: EditWalkPageProps) {
       return { error: 'Failed to update walk: ' + error.message }
     }
 
+    // Revalidate the home page cache - Check if the caught error is a Next.js redirect (NEXT_REDIRECT in digest) or a real error
+    revalidatePath('/')
+    
+    // Redirect after successful update
     redirect('/')
   }
 

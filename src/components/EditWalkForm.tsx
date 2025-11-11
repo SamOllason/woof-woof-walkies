@@ -66,6 +66,13 @@ export function EditWalkForm({ walk, onSubmit }: EditWalkFormProps) {
       }
       // If successful, the server action will redirect
     } catch (error) {
+      // Check if it's a Next.js redirect (not a real error)
+      if (error && typeof error === 'object' && 'digest' in error && 
+          typeof error.digest === 'string' && error.digest.includes('NEXT_REDIRECT')) {
+        // This is a redirect, not an error - do nothing
+        return
+      }
+      
       setErrors({ submit: 'Failed to update walk. Please try again.' })
       setIsSubmitting(false)
     }
@@ -83,7 +90,9 @@ export function EditWalkForm({ walk, onSubmit }: EditWalkFormProps) {
           id="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-500 text-gray-900 ${
+            errors.name ? 'border-red-500' : 'border-gray-300'
+          }`}
           placeholder="e.g., Morning park walk"
         />
         {errors.name && (
@@ -103,7 +112,9 @@ export function EditWalkForm({ walk, onSubmit }: EditWalkFormProps) {
           onChange={(e) => setDistance(e.target.value)}
           step="0.1"
           min="0"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-500 text-gray-900 ${
+            errors.distance ? 'border-red-500' : 'border-gray-300'
+          }`}
           placeholder="e.g., 2.5"
         />
         {errors.distance && (
@@ -122,7 +133,9 @@ export function EditWalkForm({ walk, onSubmit }: EditWalkFormProps) {
           value={duration}
           onChange={(e) => setDuration(e.target.value)}
           min="0"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-500 text-gray-900 ${
+            errors.duration ? 'border-red-500' : 'border-gray-300'
+          }`}
           placeholder="e.g., 30"
         />
         {errors.duration && (
@@ -139,7 +152,7 @@ export function EditWalkForm({ walk, onSubmit }: EditWalkFormProps) {
           id="difficulty"
           value={difficulty}
           onChange={(e) => setDifficulty(e.target.value as 'easy' | 'moderate' | 'hard')}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
         >
           <option value="easy">Easy</option>
           <option value="moderate">Moderate</option>
@@ -157,7 +170,7 @@ export function EditWalkForm({ walk, onSubmit }: EditWalkFormProps) {
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           rows={4}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-500 text-gray-900"
           placeholder="Any additional details about this walk..."
         />
       </div>
@@ -174,13 +187,13 @@ export function EditWalkForm({ walk, onSubmit }: EditWalkFormProps) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
+          className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
         >
           {isSubmitting ? 'Updating...' : 'Update Walk'}
         </button>
         <Link
           href="/"
-          className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 text-center"
+          className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 text-center transition-colors"
         >
           Cancel
         </Link>
