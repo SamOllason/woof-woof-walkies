@@ -97,7 +97,7 @@ Development plan for Woof Woof Walkies - prioritized by learning value and emplo
 
 **Features:**
 - [ ] **Step 1: API Setup & Cost Protection**
-  - [ ] Create OpenAI account and get API key
+  - [x] Create OpenAI account and get API key
   - [ ] Set monthly spending limit ($10) in OpenAI dashboard
   - [ ] Create Google Cloud account and enable Maps APIs (Geocoding + Places)
   - [ ] Add API keys to `.env.local` and `.env.example`
