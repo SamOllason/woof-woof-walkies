@@ -83,7 +83,141 @@ Development plan for Woof Woof Walkies - prioritized by learning value and emplo
 
 ## 🎯 Priority Roadmap
 
-### Phase 7: File Upload (Walk Photos) 📸
+### Phase 7: AI-Powered Walk Recommendations 🤖
+**Time estimate:** 3-4 hours  
+**Employability impact:** ⭐⭐⭐⭐⭐ (Highly differentiating!)
+
+**Goal:** Allow users to discover new walking routes in their area using AI-powered personalized recommendations based on their walking history and nearby points of interest.
+
+**AI Architecture Decisions:**
+- **LLM Provider:** OpenAI GPT-4o-mini (cost-effective at $0.15/$0.60 per 1M tokens vs GPT-4o at $2.50/$10.00)
+- **Location Service:** Google Maps API (Geocoding + Places)
+- **Cost Protection:** Rate limiting (5 requests/hour/user), caching (24hr), hard budget limits ($10/month)
+- **Fallback Strategy:** Feature flag for emergency disable, graceful degradation with message
+
+**Features:**
+- [ ] **Step 1: API Setup & Cost Protection**
+  - [ ] Create OpenAI account and get API key
+  - [ ] Set monthly spending limit ($10) in OpenAI dashboard
+  - [ ] Create Google Cloud account and enable Maps APIs (Geocoding + Places)
+  - [ ] Add API keys to `.env.local` and `.env.example`
+  - [ ] Add `AI_RECOMMENDATIONS_ENABLED` feature flag to environment variables
+  - [ ] Install dependencies: `openai`, `@googlemaps/google-maps-services-js`
+
+- [ ] **Step 2: Rate Limiting Infrastructure**
+  - [ ] Create `ai_usage` table in Supabase for tracking requests
+  - [ ] RLS policy: users can only read their own usage
+  - [ ] Server Action: `checkAIRateLimit()` - validates user hasn't exceeded hourly limit (5 requests)
+  - [ ] Tests for rate limiting logic
+  - [ ] User-friendly error message component for rate limit exceeded
+
+- [ ] **Step 3: Google Maps Integration**
+  - [ ] Create utility: `geocodeAddress()` - converts postcode/address to lat/lng
+  - [ ] Create utility: `findNearbyPlaces()` - finds parks, trails, points of interest within radius
+  - [ ] Handle API errors gracefully (invalid address, API quota exceeded)
+  - [ ] Tests for geocoding and places utilities
+  - [ ] Mock Google Maps API in tests
+
+- [ ] **Step 4: OpenAI Integration & Prompt Engineering**
+  - [ ] Create utility: `generateWalkRecommendations()` - calls OpenAI API
+  - [ ] Design prompt template that includes:
+    - User's walk history summary (avg distance, difficulty preferences)
+    - Nearby locations from Google Places
+    - Request for 3-5 personalized recommendations with explanations
+  - [ ] Use GPT-4o-mini model for cost efficiency
+  - [ ] Optimize token usage (concise prompts, JSON response format)
+  - [ ] Handle OpenAI API errors (rate limits, timeouts, invalid responses)
+  - [ ] Tests with mocked OpenAI responses
+
+- [ ] **Step 5: Caching Layer**
+  - [ ] Create `ai_recommendations_cache` table in Supabase
+  - [ ] Cache key: `user_id + location` (hashed)
+  - [ ] Cache duration: 24 hours
+  - [ ] Server Action: Check cache before calling OpenAI
+  - [ ] Automatic cache invalidation after 24 hours
+  - [ ] Tests for cache hit/miss scenarios
+
+- [ ] **Step 6: UI - Recommendations Page**
+  - [ ] Create `/recommendations` page (Server Component)
+  - [ ] Location search input with autocomplete (optional enhancement)
+  - [ ] "Get Recommendations" button
+  - [ ] Loading state: "Finding great walks near you..."
+  - [ ] Results display: Card-based layout with AI-generated recommendations
+  - [ ] Each card shows: route name, distance, difficulty, highlights, "why recommended"
+  - [ ] "Save as Walk" button (pre-fills AddWalkForm with AI suggestion)
+  - [ ] Error states: rate limit exceeded, API errors, invalid location
+  - [ ] Feature disabled message if `AI_RECOMMENDATIONS_ENABLED=false`
+
+- [ ] **Step 7: Server Actions**
+  - [ ] `getRecommendationsAction(location: string)`:
+    - Check feature flag (throw error if disabled)
+    - Validate user authentication
+    - Check rate limit (throw error if exceeded)
+    - Check cache (return if hit)
+    - Geocode location
+    - Find nearby places
+    - Fetch user's walk history for personalization
+    - Generate AI recommendations
+    - Store in cache
+    - Log usage to `ai_usage` table
+    - Return recommendations
+  - [ ] Comprehensive error handling with user-friendly messages
+  - [ ] Tests for all happy/sad paths
+
+- [ ] **Step 8: Documentation & Architecture**
+  - [ ] Create `documentation/architecture/ai-recommendations.md`
+  - [ ] Document data flow diagram (User → Google Maps → OpenAI → Cache → UI)
+  - [ ] Document AI decisions (model choice, cost controls, prompt design)
+  - [ ] Document rate limiting strategy
+  - [ ] Add cost analysis section (expected costs, worst-case scenarios)
+  - [ ] Add to README feature list
+  - [ ] Update `.env.example` with new API keys
+
+**Skills learned:**
+- OpenAI API integration and prompt engineering
+- Google Maps API (Geocoding + Places)
+- Cost management for AI services (rate limiting, caching, budget controls)
+- LLM selection criteria (performance vs cost trade-offs)
+- Multi-API orchestration (combining Maps + AI)
+- Feature flags for production safety
+- Caching strategies for expensive operations
+- User experience design for AI features (loading states, error handling)
+
+**Key AI Decisions:**
+
+1. **Model Selection: GPT-4o-mini over GPT-4o**
+   - **Rationale:** 15x cheaper ($0.15 vs $2.50 per 1M input tokens) with minimal quality loss for recommendation tasks
+   - **Trade-off:** Slightly less sophisticated reasoning, but sufficient for generating walk suggestions
+   - **Impact:** Reduces costs from ~$0.015/request to ~$0.001/request
+
+2. **Rate Limiting: 5 requests/hour/user**
+   - **Rationale:** Prevents abuse while allowing legitimate exploration (5 different locations per hour is generous)
+   - **Implementation:** Database-backed (auditable, persistent across server restarts)
+   - **User Impact:** Minimal friction - most users won't hit limit
+
+3. **Caching Strategy: 24-hour location-based cache**
+   - **Rationale:** Same location searches return identical results (parks don't move!)
+   - **Impact:** Reduces API calls by ~80% after initial usage
+   - **Trade-off:** Recommendations don't update with real-time data (acceptable for this use case)
+
+4. **Prompt Optimization:**
+   - **Technique:** Concise instructions, structured output (JSON), minimal context
+   - **Before:** ~500 tokens/request, After: ~100 tokens/request
+   - **Impact:** 5x cost reduction per request
+
+5. **Fallback Strategy: Feature flag + graceful degradation**
+   - **Rationale:** Production safety - can disable instantly if costs spike or API issues occur
+   - **Implementation:** Environment variable check + user-friendly message
+   - **Business Impact:** Protects budget while maintaining app availability
+
+**Cost Analysis:**
+- Development/testing: ~$0.10 (20 requests with caching)
+- Production (solo portfolio): ~$0.50-2/month (with rate limits + caching)
+- Worst case (bug/abuse): $10/month (hard OpenAI limit prevents further charges)
+
+---
+
+### Phase 8: File Upload (Walk Photos) 📸
 **Time estimate:** 2-3 hours  
 **Employability impact:** ⭐⭐⭐⭐
 
@@ -105,7 +239,7 @@ Development plan for Woof Woof Walkies - prioritized by learning value and emplo
 
 ---
 
-### Phase 8: Loading States & Error Handling 🎨
+### Phase 9: Loading States & Error Handling 🎨
 **Time estimate:** 1-2 hours  
 **Employability impact:** ⭐⭐⭐⭐
 
@@ -126,7 +260,7 @@ Development plan for Woof Woof Walkies - prioritized by learning value and emplo
 
 ---
 
-### Phase 9: Pagination / Infinite Scroll 📜
+### Phase 10: Pagination / Infinite Scroll 📜
 **Time estimate:** 2 hours  
 **Employability impact:** ⭐⭐⭐
 
@@ -145,7 +279,7 @@ Development plan for Woof Woof Walkies - prioritized by learning value and emplo
 
 ---
 
-### Phase 10: Dark Mode 🌙
+### Phase 11: Dark Mode 🌙
 **Time estimate:** 30-60 minutes  
 **Employability impact:** ⭐⭐
 
@@ -164,7 +298,7 @@ Development plan for Woof Woof Walkies - prioritized by learning value and emplo
 
 ---
 
-### Phase 11: Advanced Features (Polish)
+### Phase 12: Advanced Features (Polish)
 
 **Analytics Dashboard:**
 - [ ] Total distance walked
@@ -188,7 +322,7 @@ Development plan for Woof Woof Walkies - prioritized by learning value and emplo
 
 ---
 
-### Phase 12: Database Migration Management (Production Best Practice) 🔧
+### Phase 13: Database Migration Management (Production Best Practice) 🔧
 **Goal:** Professional database change management  
 **Time estimate:** 2-3 hours  
 **Employability impact:** ⭐⭐⭐⭐
@@ -258,7 +392,16 @@ npx supabase migration new add_feature
 - Debouncing
 - Complex queries
 
-**Phases 6-10:**
+**Phase 7 (AI Recommendations):**
+- OpenAI API integration
+- Multi-API orchestration
+- Prompt engineering
+- Cost management strategies
+- Rate limiting & caching
+- Feature flags
+- Production safety patterns
+
+**Phases 8-12:**
 - File handling
 - Loading states
 - Scalability
@@ -266,20 +409,24 @@ npx supabase migration new add_feature
 
 ---
 
-## 💼 Resume Talking Points (After Completion)
+## 💼 Technical Achievements Summary
 
-After completing Phases 3-5, you can say:
+After completing Phases 3-7:
 
-> **"Built a full-stack dog walking tracker with Next.js 15, React Server Components, TypeScript, and Supabase."**
->
-> **Technical highlights:**
-> - Implemented secure authentication with Row-Level Security policies
-> - Full CRUD operations with optimistic UI updates for better UX
-> - Advanced search and filtering with debounced inputs and URL state management
-> - Test-driven development with Vitest and React Testing Library (30+ tests)
-> - Server-side rendering with React Server Components for optimal performance
-> - Server Actions for type-safe client-server communication
-> - Responsive design with Tailwind CSS
+**Project:** Full-stack dog walking tracker with AI-powered recommendations using Next.js 15, React Server Components, TypeScript, and Supabase.
+
+**Technical highlights:**
+- Implemented secure authentication with Row-Level Security policies
+- Full CRUD operations with optimistic UI updates for better UX
+- Advanced search and filtering with debounced inputs and URL state management
+- AI-powered walk recommendations using OpenAI GPT-4o-mini and Google Maps API
+- Multi-API orchestration (OpenAI + Google Maps) with cost controls
+- Rate limiting and caching strategies to keep AI costs under $2/month
+- Prompt engineering for efficient token usage (5x cost reduction)
+- Test-driven development with Vitest and React Testing Library (130+ tests)
+- Server-side rendering with React Server Components for optimal performance
+- Server Actions for type-safe client-server communication
+- Responsive design with Tailwind CSS
 
 ---
 

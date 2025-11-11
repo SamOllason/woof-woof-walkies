@@ -270,7 +270,7 @@ When implementing features that showcase expertise:
 This project is about **learning and demonstrating expertise**, not just shipping features. Take time to:
 
 - Understand *why* patterns work, not just *how*
-- Write code you'd be proud to show in an interview
+- Write code that demonstrates professional quality
 - Document your learning journey
 - Build features that showcase modern best practices
 - Prioritize code quality over speed
