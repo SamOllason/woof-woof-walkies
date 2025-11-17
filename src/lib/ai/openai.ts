@@ -1,24 +1,21 @@
 import OpenAI from 'openai'
 import { HttpsProxyAgent } from 'https-proxy-agent'
 
-// Initialize OpenAI client
-const apiKey = process.env.OPENAI_API_KEY
-
-// Debug: Check if API key is loaded
-if (!apiKey) {
-  console.error('❌ OPENAI_API_KEY is not set in environment variables')
-} else {
-  console.log('✅ OPENAI_API_KEY loaded:', apiKey.substring(0, 20) + '...')
+// Function to get OpenAI client (lazy initialization)
+// This ensures the API key is checked at runtime, not at module load time
+function getOpenAIClient() {
+  const apiKey = process.env.OPENAI_API_KEY
+  
+  if (!apiKey) {
+    throw new Error('OPENAI_API_KEY environment variable is not set')
+  }
+  
+  return new OpenAI({
+    apiKey: apiKey,
+    timeout: 30000, // 30 second timeout
+    maxRetries: 2,
+  })
 }
-
-// Try to bypass SSL issues by setting timeout and custom fetch options
-const openai = new OpenAI({
-  apiKey: apiKey,
-  timeout: 30000, // 30 second timeout
-  maxRetries: 2,
-  // Disable SSL verification as last resort (development only!)
-  dangerouslyAllowBrowser: false,
-})
 
 export interface WalkRecommendation {
   name: string
@@ -98,7 +95,9 @@ Example format:
   try {
     console.log('🔵 Attempting OpenAI API call...')
     console.log('🔵 Model: gpt-4o-mini')
-    console.log('🔵 API Key (first 20 chars):', apiKey?.substring(0, 20))
+    
+    // Get OpenAI client with API key validation
+    const openai = getOpenAIClient()
     
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini', // Cost-effective model

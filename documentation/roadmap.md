@@ -448,3 +448,4 @@ _This roadmap prioritizes features that maximize learning and employability. Adj
 1. Using AI to recommend walks in local area, google maps integration?
 2. Record walks using GPS? link to e.g. Strava?
 3. Walk inspiration - things to see in local area based on location
+
