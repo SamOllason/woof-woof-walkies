@@ -134,7 +134,7 @@ Development plan for Woof Woof Walkies - prioritized by learning value and emplo
 
 - [ ] **Step 5: Google Maps APIs Setup**
   - [x] Enable Places API in Google Cloud Console
-  - [ ] Enable Directions API in Google Cloud Console
+  - [x] Enable Directions API in Google Cloud Console
   - [ ] Verify API keys have necessary permissions
 
 - [ ] **Step 6: Build Map Utilities**
