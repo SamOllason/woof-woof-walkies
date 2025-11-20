@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { getRecommendationsAction, generateCustomRouteAction } from './actions'
 import { WalkRecommendation } from '@/lib/ai/openai'
 import CustomRouteForm, { CustomRouteFormData } from '@/components/CustomRouteForm'
+import RouteMap from '@/components/RouteMap'
 import type { RouteRecommendation } from '@/types/maps'
 import toast from 'react-hot-toast'
 
@@ -215,6 +216,12 @@ export default function RecommendationsClient() {
                   </li>
                 ))}
               </ol>
+            </div>
+
+            {/* Map Display */}
+            <div className="mb-6">
+              <h3 className="font-semibold text-gray-900 mb-3">Route Map</h3>
+              <RouteMap route={customRoute} />
             </div>
 
             {/* Turn-by-Turn Directions */}

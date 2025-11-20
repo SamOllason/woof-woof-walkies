@@ -154,7 +154,7 @@ Development plan for Woof Woof Walkies - prioritized by learning value and emplo
   - [x] Implemented helper functions: `generateWaypointsWithAI()`, `generateRouteName()`, `generateHighlights()`
   - [x] Comprehensive error handling for each API step
 
-- [ ] **Step 8: Update UI for Custom Routes**
+- [x] **Step 8: Update UI for Custom Routes**
   - [x] Created `CustomRouteForm.tsx` component (TDD approach)
     - [x] Write comprehensive test suite first
     - [x] Implement component to pass all tests
@@ -164,25 +164,40 @@ Development plan for Woof Woof Walkies - prioritized by learning value and emplo
     - [x] Circular route toggle
     - [x] Form validation and error handling
     - [x] Loading states and accessibility
-  - [x] Added ✨ emoji to "AI Walk Recommendations" heading
-  - [ ] Integrate `CustomRouteForm` into recommendations page
-  - [ ] Create Server Action `generateCustomRouteAction()`
-  - [ ] Display `RouteRecommendation` results with waypoints
-  - [ ] Add "Save as Walk" functionality
+  - [x] Added ✨ emoji to "AI Walk Recommendations" heading and header nav
+  - [x] Integrated `CustomRouteForm` into recommendations page with mode toggle
+  - [x] Created Server Action `generateCustomRouteAction()`
+  - [x] Display `RouteRecommendation` results with:
+    - [x] Route name and estimated distance/duration
+    - [x] Numbered waypoint list
+    - [x] Turn-by-turn directions with HTML formatting
+
+**Note on Local Development:**
+- OpenAI API calls fail locally due to network blocking (`ECONNRESET` errors)
+- Google Maps APIs work fine locally
+- Solution: Deploy to Vercel for testing (network issues don't occur in production)
+- Alternative: Add `OPENAI_MOCK_MODE=true` to `.env.local` for offline development
 
 - [ ] **Step 9: Visual Map Display**
+  - [ ] Install Google Maps React library (`@vis.gl/react-google-maps`)
   - [ ] Create `src/components/RouteMap.tsx` 
   - [ ] Display route polyline on Google Map
   - [ ] Show waypoint markers (start, POIs, end)
-  - [ ] Add distance/duration info
-  - [ ] "Save as Walk" button
+  - [ ] Integrate map into custom route results display
 
 - [ ] **Step 10: Deploy & Test**
   - [ ] Deploy to Vercel
-  - [ ] Test with multiple locations
+  - [ ] Test with multiple locations (Bradford on Avon, London, etc.)
   - [ ] Verify cost stays low (~$0.04/route)
+  - [ ] Test map display with real routes
 
 **Add Later (Cost Control & Polish):**
+- [ ] **"Save as Walk" Functionality**
+  - [ ] Add button to save generated routes to walks table
+  - [ ] Extract distance/duration from route data
+  - [ ] Set appropriate difficulty level
+  - [ ] Pre-fill form with route details
+
 - [ ] **Rate Limiting** (prevent cost overruns)
   - [ ] `ai_usage` table in Supabase
   - [ ] 5 requests/hour/user limit
