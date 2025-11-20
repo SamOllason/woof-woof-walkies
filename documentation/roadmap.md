@@ -155,12 +155,20 @@ Development plan for Woof Woof Walkies - prioritized by learning value and emplo
   - [x] Comprehensive error handling for each API step
 
 - [ ] **Step 8: Update UI for Custom Routes**
-  - [ ] Update recommendations page with route preferences form:
-    - Distance selector (1-10km)
-    - Must-include POIs (cafe, dog park, etc.)
-    - Circular route toggle
-  - [ ] Update Server Action to use `generateCustomRoute()`
-  - [ ] Display generated routes with waypoint details
+  - [x] Created `CustomRouteForm.tsx` component (TDD approach)
+    - [x] Write comprehensive test suite first
+    - [x] Implement component to pass all tests
+    - [x] Distance slider (1-10km with 0.5km steps)
+    - [x] Must-include POI checkboxes (cafe, dog park, water access)
+    - [x] Preference checkboxes (off-leash, scenic, shaded)
+    - [x] Circular route toggle
+    - [x] Form validation and error handling
+    - [x] Loading states and accessibility
+  - [x] Added ✨ emoji to "AI Walk Recommendations" heading
+  - [ ] Integrate `CustomRouteForm` into recommendations page
+  - [ ] Create Server Action `generateCustomRouteAction()`
+  - [ ] Display `RouteRecommendation` results with waypoints
+  - [ ] Add "Save as Walk" functionality
 
 - [ ] **Step 9: Visual Map Display**
   - [ ] Create `src/components/RouteMap.tsx` 
