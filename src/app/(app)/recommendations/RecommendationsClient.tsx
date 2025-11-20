@@ -35,7 +35,7 @@ export default function RecommendationsClient() {
     <div className="mx-auto max-w-4xl">
       <div className="mb-8">
         <h1 className="mb-2 text-3xl font-bold text-gray-900">
-          AI Walk Recommendations
+          ✨ AI Walk Recommendations
         </h1>
         <p className="text-gray-600">
           Get personalized dog walking route suggestions for any location
