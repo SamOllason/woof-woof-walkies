@@ -264,6 +264,20 @@ export default function RecommendationsClient() {
               </ol>
             </div>
 
+             {/* Action Buttons */}
+            <div className="flex gap-3 pt-4 border-t border-gray-200">
+              <button
+                onClick={handleShowMeAnother}
+                disabled={isPending}
+                className="flex-1 rounded-lg bg-white border-2 border-blue-600 px-6 py-3 font-semibold text-blue-600 
+                  hover:bg-blue-50 disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed
+                  focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition"
+              >
+                {isPending ? 'Generating...' : '🔄 Show Me Another'}
+              </button>
+              {/* TODO: Add "Save as Walk" button here */}
+            </div>
+
             {/* Map Display */}
             <div className="mb-6">
               <h3 className="font-semibold text-gray-900 mb-3">Route Map</h3>
@@ -293,19 +307,6 @@ export default function RecommendationsClient() {
               </div>
             )}
 
-            {/* Action Buttons */}
-            <div className="flex gap-3 pt-4 border-t border-gray-200">
-              <button
-                onClick={handleShowMeAnother}
-                disabled={isPending}
-                className="flex-1 rounded-lg bg-white border-2 border-blue-600 px-6 py-3 font-semibold text-blue-600 
-                  hover:bg-blue-50 disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed
-                  focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition"
-              >
-                {isPending ? 'Generating...' : '🔄 Show Me Another'}
-              </button>
-              {/* TODO: Add "Save as Walk" button here */}
-            </div>
           </div>
         </div>
       )}
