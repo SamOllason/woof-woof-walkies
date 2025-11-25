@@ -19,6 +19,12 @@ function RoutePolyline({ directions, waypoints }: { directions?: DirectionsResul
 
   useEffect(() => {
     if (!map || waypoints.length < 2) return
+    
+    // Wait for geometry library to load
+    if (!google.maps.geometry?.encoding) {
+      console.warn('Google Maps geometry library not loaded yet')
+      return
+    }
 
     let polyline: google.maps.Polyline
 
@@ -111,7 +117,7 @@ export default function RouteMap({ waypoints, directions, height = '400px' }: Ro
       role="region"
       aria-label="Interactive map showing dog walking route"
     >
-      <APIProvider apiKey={apiKey}>
+      <APIProvider apiKey={apiKey} libraries={['geometry']}>
         <Map
           defaultCenter={center}
           defaultZoom={zoom}

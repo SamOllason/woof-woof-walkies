@@ -162,13 +162,16 @@ describe('CustomRouteForm', () => {
       const mockSubmit = vi.fn()
       render(<CustomRouteForm onSubmit={mockSubmit} />)
 
-      const locationInput = screen.getByLabelText(/location/i)
+      const locationInput = screen.getByLabelText(/starting location/i)
       await user.type(locationInput, 'Bradford on Avon')
 
       const submitButton = screen.getByRole('button', { name: /generate route/i })
       await user.click(submitButton)
 
-      expect(screen.queryByText(/please enter a location/i)).not.toBeInTheDocument()
+      await waitFor(() => {
+        expect(screen.queryByText(/please enter a location/i)).not.toBeInTheDocument()
+        expect(mockSubmit).toHaveBeenCalled()
+      })
     })
   })
 
@@ -179,13 +182,13 @@ describe('CustomRouteForm', () => {
       render(<CustomRouteForm onSubmit={mockSubmit} />)
 
       // Fill in location
-      const locationInput = screen.getByLabelText(/location/i)
+      const locationInput = screen.getByLabelText(/starting location/i)
       await user.type(locationInput, 'Bradford on Avon')
 
-      // Set distance to 3km
+      // Set distance to 3km using keyboard navigation
       const distanceSlider = screen.getByLabelText(/distance/i)
-      await user.clear(distanceSlider)
-      await user.type(distanceSlider, '3')
+      await user.click(distanceSlider)
+      await user.keyboard('{ArrowRight}{ArrowRight}')
 
       // Check cafe and dog park
       await user.click(screen.getByLabelText(/cafe/i))

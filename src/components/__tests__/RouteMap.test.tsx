@@ -25,6 +25,11 @@ vi.mock('@vis.gl/react-google-maps', () => ({
       data-label={label}
     />
   ),
+  useMap: () => ({
+    // Mock map object that RoutePolyline needs
+    setCenter: vi.fn(),
+    setZoom: vi.fn(),
+  }),
 }))
 
 describe('RouteMap', () => {

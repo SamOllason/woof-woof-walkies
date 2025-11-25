@@ -246,7 +246,18 @@ export default function RecommendationsClient() {
                     </span>
                     <span className="text-gray-700 flex items-center gap-2">
                       <span className="text-base">{getWaypointEmoji(waypoint)}</span>
-                      {waypoint.name}
+                      {waypoint.placeId ? (
+                        <a
+                          href={`https://www.google.com/maps/place/?q=place_id:${waypoint.placeId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 hover:underline"
+                        >
+                          {waypoint.name}
+                        </a>
+                      ) : (
+                        waypoint.name
+                      )}
                     </span>
                   </li>
                 ))}

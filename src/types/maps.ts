@@ -43,6 +43,7 @@ export interface Waypoint {
   name: string
   type?: 'start' | 'end' | 'poi' | 'waypoint'
   category?: 'cafe' | 'park' | 'dog_park' | 'water' | 'other' // Optional: POI category for visual distinction
+  placeId?: string // Optional: Google Place ID for linking to Google Maps
 }
 
 export interface DirectionsResult {

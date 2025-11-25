@@ -295,9 +295,17 @@ async function generateWaypointsWithAI(
       const types = poi.types.join(', ')
       
       return `${index + 1}. "${poi.name}" (${types}) - ${distance} ${rating}
-   Location: ${poi.location.lat}, ${poi.location.lng}`
+   Location: ${poi.location.lat}, ${poi.location.lng}
+   PlaceID: ${poi.placeId}`
     })
     .join('\n')
+
+  // Create a lookup map for placeIds by coordinates
+  const placeIdMap = new Map<string, string>()
+  shuffledPOIs.forEach(poi => {
+    const key = `${poi.location.lat.toFixed(6)},${poi.location.lng.toFixed(6)}`
+    placeIdMap.set(key, poi.placeId)
+  })
 
   const mustIncludeText = preferences.mustInclude?.length 
     ? `\nMUST INCLUDE: ${preferences.mustInclude.join(', ')}`
@@ -336,19 +344,16 @@ OUTPUT FORMAT (JSON only, no markdown):
 {
   "waypoints": [
     {"lat": ${startCoords.lat}, "lng": ${startCoords.lng}, "name": "Start", "type": "start"},
-    {"lat": 51.xxx, "lng": -2.xxx, "name": "Place Name", "type": "poi", "category": "cafe|park|dog_park|water|other"},
+    {"lat": 51.xxx, "lng": -2.xxx, "name": "Place Name", "type": "poi", "category": "cafe|park|dog_park|water|other", "placeId": "ChIJ..."},
     ...
     {"lat": ${startCoords.lat}, "lng": ${startCoords.lng}, "name": "End", "type": "end"}
   ],
   "reasoning": "Brief explanation of route choices"
 }
 
-IMPORTANT: Set category field for each POI:
-- "cafe" for cafes, coffee shops, tea rooms
-- "dog_park" for dog parks, off-leash areas
-- "park" for regular parks, gardens, green spaces
-- "water" for water fountains, streams, rivers
-- "other" for other points of interest
+IMPORTANT: 
+- Set category field for each POI: cafe, dog_park, park, water, or other
+- Include the placeId from the POI list above for each waypoint
 `
 
   const openai = getOpenAIClient()
@@ -385,7 +390,24 @@ IMPORTANT: Set category field for each POI:
     throw new Error('AI generated invalid waypoints')
   }
 
-  return aiResponse.waypoints
+  // Enrich waypoints with placeIds if missing (fallback lookup by coordinates)
+  const enrichedWaypoints = aiResponse.waypoints.map(waypoint => {
+    if (waypoint.placeId || waypoint.type === 'start' || waypoint.type === 'end') {
+      return waypoint
+    }
+    
+    // Try to find placeId by matching coordinates
+    const key = `${waypoint.lat.toFixed(6)},${waypoint.lng.toFixed(6)}`
+    const placeId = placeIdMap.get(key)
+    
+    if (placeId) {
+      return { ...waypoint, placeId }
+    }
+    
+    return waypoint
+  })
+
+  return enrichedWaypoints
 }
 
 /**

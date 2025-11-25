@@ -84,11 +84,13 @@ describe('SearchFilters', () => {
       // Should not update immediately
       expect(mockPush).not.toHaveBeenCalled()
       
-      // Fast-forward debounce timer and run all pending timers
+      // Fast-forward debounce timer
       await vi.advanceTimersByTimeAsync(300)
       
       // Should update URL after debounce
-      expect(mockPush).toHaveBeenCalledWith('?search=park')
+      await waitFor(() => {
+        expect(mockPush).toHaveBeenCalledWith('?search=park')
+      })
       
       vi.useRealTimers()
     })
@@ -103,7 +105,7 @@ describe('SearchFilters', () => {
       const searchInput = screen.getByLabelText(/search/i)
       await user.clear(searchInput)
       
-      vi.advanceTimersByTime(300)
+      await vi.advanceTimersByTimeAsync(300)
       
       await waitFor(() => {
         expect(mockPush).toHaveBeenCalledWith('?')
@@ -115,41 +117,30 @@ describe('SearchFilters', () => {
 
   describe('Difficulty Filter', () => {
     it('updates URL immediately when difficulty is selected', async () => {
-      vi.useFakeTimers()
-      const user = userEvent.setup({ delay: null })
+      const user = userEvent.setup()
       
       render(<SearchFilters />)
       
       const difficultySelect = screen.getByLabelText(/difficulty/i)
       await user.selectOptions(difficultySelect, 'moderate')
       
-      // Run any pending timers
-      await vi.runAllTimersAsync()
-      
       await waitFor(() => {
         expect(mockPush).toHaveBeenCalledWith('?difficulty=moderate')
       })
-      
-      vi.useRealTimers()
     })
 
     it('removes difficulty param when set to "All difficulties"', async () => {
-      vi.useFakeTimers()
       mockSearchParams.set('difficulty', 'easy')
-      const user = userEvent.setup({ delay: null })
+      const user = userEvent.setup()
       
       render(<SearchFilters />)
       
       const difficultySelect = screen.getByLabelText(/difficulty/i)
       await user.selectOptions(difficultySelect, '')
       
-      await vi.runAllTimersAsync()
-      
       await waitFor(() => {
         expect(mockPush).toHaveBeenCalledWith('?')
       })
-      
-      vi.useRealTimers()
     })
   })
 
@@ -163,7 +154,7 @@ describe('SearchFilters', () => {
       const minDistanceInput = screen.getByLabelText(/min distance/i)
       await user.type(minDistanceInput, '2.5')
       
-      await vi.runAllTimersAsync()
+      await vi.advanceTimersByTimeAsync(300)
       
       await waitFor(() => {
         expect(mockPush).toHaveBeenCalledWith('?minDistance=2.5')
@@ -181,7 +172,7 @@ describe('SearchFilters', () => {
       const maxDistanceInput = screen.getByLabelText(/max distance/i)
       await user.type(maxDistanceInput, '10')
       
-      await vi.runAllTimersAsync()
+      await vi.advanceTimersByTimeAsync(300)
       
       await waitFor(() => {
         expect(mockPush).toHaveBeenCalledWith('?maxDistance=10')
@@ -200,7 +191,7 @@ describe('SearchFilters', () => {
       const minDistanceInput = screen.getByLabelText(/min distance/i)
       await user.type(minDistanceInput, '2')
       
-      await vi.runAllTimersAsync()
+      await vi.advanceTimersByTimeAsync(300)
       
       await waitFor(() => {
         expect(mockPush).toHaveBeenCalledWith('?search=park&minDistance=2')
@@ -212,46 +203,36 @@ describe('SearchFilters', () => {
 
   describe('Clear Filters', () => {
     it('clears all filters and navigates to home', async () => {
-      vi.useFakeTimers()
       mockSearchParams.set('search', 'park')
       mockSearchParams.set('difficulty', 'easy')
       mockSearchParams.set('minDistance', '2')
       mockSearchParams.set('maxDistance', '5')
       
-      const user = userEvent.setup({ delay: null })
+      const user = userEvent.setup()
       render(<SearchFilters />)
       
       const clearButton = screen.getByText(/clear filters/i)
       await user.click(clearButton)
-      
-      await vi.runAllTimersAsync()
       
       await waitFor(() => {
         expect(mockPush).toHaveBeenCalledWith('/')
       })
-      
-      vi.useRealTimers()
     })
 
     it('resets all input values when cleared', async () => {
-      vi.useFakeTimers()
       mockSearchParams.set('search', 'park')
       mockSearchParams.set('difficulty', 'easy')
       
-      const user = userEvent.setup({ delay: null })
+      const user = userEvent.setup()
       render(<SearchFilters />)
       
       const clearButton = screen.getByText(/clear filters/i)
       await user.click(clearButton)
-      
-      await vi.runAllTimersAsync()
       
       await waitFor(() => {
         expect(screen.getByLabelText(/search/i)).toHaveValue('')
         expect(screen.getByLabelText(/difficulty/i)).toHaveValue('')
       })
-      
-      vi.useRealTimers()
     })
   })
 
@@ -274,7 +255,7 @@ describe('SearchFilters', () => {
       const searchInput = screen.getByLabelText(/search/i)
       await user.type(searchInput, 'mountain')
       
-      vi.advanceTimersByTime(300)
+      await vi.advanceTimersByTimeAsync(300)
       
       await waitFor(() => {
         const lastCall = mockPush.mock.calls[mockPush.mock.calls.length - 1][0]
