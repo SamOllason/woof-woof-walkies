@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import CustomRouteForm from '../CustomRouteForm'
 
@@ -83,12 +83,15 @@ describe('CustomRouteForm', () => {
       const mockSubmit = vi.fn()
       render(<CustomRouteForm onSubmit={mockSubmit} />)
 
-      const distanceSlider = screen.getByLabelText(/distance/i)
-      await user.clear(distanceSlider)
-      await user.type(distanceSlider, '5')
+      const distanceSlider = screen.getByLabelText(/distance/i) as HTMLInputElement
+      
+      // Change slider value directly (keyboard navigation doesn't work reliably on range inputs)
+      fireEvent.change(distanceSlider, { target: { value: '3' } })
 
-      expect(distanceSlider).toHaveValue(5)
-      expect(screen.getByText(/5 km/i)).toBeInTheDocument()
+      await waitFor(() => {
+        expect(distanceSlider.value).toBe('3')
+        expect(screen.getByText(/3 km/i)).toBeInTheDocument()
+      })
     })
 
     it('allows user to check must-include options', async () => {
@@ -185,10 +188,9 @@ describe('CustomRouteForm', () => {
       const locationInput = screen.getByLabelText(/starting location/i)
       await user.type(locationInput, 'Bradford on Avon')
 
-      // Set distance to 3km using keyboard navigation
+      // Set distance to 3km
       const distanceSlider = screen.getByLabelText(/distance/i)
-      await user.click(distanceSlider)
-      await user.keyboard('{ArrowRight}{ArrowRight}')
+      fireEvent.change(distanceSlider, { target: { value: '3' } })
 
       // Check cafe and dog park
       await user.click(screen.getByLabelText(/cafe/i))
@@ -202,13 +204,15 @@ describe('CustomRouteForm', () => {
       await user.click(submitButton)
 
       await waitFor(() => {
-        expect(mockSubmit).toHaveBeenCalledWith({
-          location: 'Bradford on Avon',
-          distance: 3,
-          mustInclude: ['cafe', 'dog_park'],
-          preferences: ['off-leash'],
-          circular: true,
-        })
+        expect(mockSubmit).toHaveBeenCalled()
+      })
+      
+      expect(mockSubmit).toHaveBeenCalledWith({
+        location: 'Bradford on Avon',
+        distance: 3,
+        mustInclude: ['cafe', 'dog_park'],
+        preferences: ['off-leash'],
+        circular: true,
       })
     })
 

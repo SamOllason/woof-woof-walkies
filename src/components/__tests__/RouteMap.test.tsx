@@ -3,6 +3,22 @@ import { render, screen } from '@testing-library/react'
 import RouteMap from '../RouteMap'
 import type { Waypoint } from '@/types/maps'
 
+// Mock global google object for Maps API
+;(global as any).google = {
+  maps: {
+    geometry: {
+      encoding: {
+        decodePath: vi.fn(() => []),
+      },
+    },
+    Polyline: vi.fn(function() {
+      return {
+        setMap: vi.fn(),
+      }
+    }),
+  },
+}
+
 // Mock the Google Maps React library
 // Note: @vis.gl/react-google-maps doesn't export Polyline component
 // Routes are typically drawn using DirectionsRenderer
