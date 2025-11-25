@@ -276,8 +276,16 @@ async function generateWaypointsWithAI(
   preferences: RoutePreferences,
   locationName: string
 ): Promise<Waypoint[]> {
+  // Shuffle POIs using Fisher-Yates algorithm for proper randomization
+  // This ensures "Show Me Another" generates different routes even with same preferences
+  const shuffledPOIs = [...availablePOIs]
+  for (let i = shuffledPOIs.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledPOIs[i], shuffledPOIs[j]] = [shuffledPOIs[j], shuffledPOIs[i]]
+  }
+  
   // Format POI data for AI prompt
-  const poisSummary = availablePOIs
+  const poisSummary = shuffledPOIs
     .slice(0, 20) // Limit to top 20 to keep prompt size reasonable
     .map((poi, index) => {
       const distance = poi.distanceFromStart 
