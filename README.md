@@ -2,11 +2,11 @@
 
 > **AI-Powered Dog Walking Route Planner** - A production-ready full-stack application showcasing modern web development with intelligent route generation.
 
-[![Next.js 15](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
+[![Next.js 16](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)
 [![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o--mini-412991)](https://openai.com/)
 [![Google Maps](https://img.shields.io/badge/Google%20Maps-APIs-4285F4)](https://developers.google.com/maps)
-[![Tests](https://img.shields.io/badge/tests-130%2B%20passing-success)](/)
+[![Tests](https://img.shields.io/badge/tests-199%20passing-success)](/)
 
 A sophisticated web application that combines AI, real-time mapping, and intelligent route planning to create personalized dog walking experiences. Features custom route generation powered by OpenAI GPT-4o-mini, integrated with Google Maps APIs for real-world navigation.
 
@@ -16,13 +16,13 @@ This isn't just another CRUD app—it's a **demonstration of modern AI engineeri
 
 ✨ **Multi-API Orchestration** - Seamlessly integrates 4 external APIs (OpenAI, Google Geocoding, Places, Directions) in a single user flow
 
-🤖 **Cost-Conscious AI** - Implements GPT-4o-mini with intelligent caching and rate limiting to keep costs under $2/month while maintaining quality
+🤖 **Cost-Conscious AI** - Implements GPT-4o-mini with feature flags and budget controls to keep costs under $2/month while maintaining quality
 
 🗺️ **Real-Time Route Visualization** - Decodes polylines and renders walking routes with waypoint markers on interactive maps
 
 ⚡ **Optimistic UI** - Instant feedback using React's `useOptimistic` hook with automatic rollback on failures
 
-🧪 **Test-Driven Development** - 130+ passing tests written before implementation, showcasing professional development practices
+🧪 **Test-Driven Development** - 199 passing tests written before implementation, showcasing professional development practices
 
 🔒 **Security-First Architecture** - Row-Level Security policies, server-side authentication, SQL injection protection by design
 
@@ -61,10 +61,9 @@ User Input → Geocoding API → Places API → OpenAI GPT-4o-mini → Direction
 - ~$0.04 per route generation with full API orchestration
 
 **Cost Protection Measures:**
-- Feature flags for emergency disable
-- Rate limiting (5 routes/hour/user)
-- Caching strategy (24-hour location-based cache planned)
+- Feature flags for emergency disable (`AI_RECOMMENDATIONS_ENABLED`)
 - Hard budget limits on OpenAI account
+- Future: Rate limiting and caching (planned)
 
 ### React Patterns Demonstrated
 
@@ -113,7 +112,7 @@ export async function generateCustomRoute(location, preferences) {
 ### Core Technologies
 | Category | Technology | Purpose |
 |----------|-----------|---------|
-| **Framework** | Next.js 15 (App Router) | React framework with Server Components |
+| **Framework** | Next.js 16 (App Router) | React framework with Server Components |
 | **Language** | TypeScript (strict mode) | Type safety and developer experience |
 | **Database** | PostgreSQL (Supabase) | Relational database with RLS policies |
 | **Authentication** | Supabase Auth | Secure user authentication |
@@ -234,7 +233,7 @@ This project showcases production-ready development practices:
 ### AI Engineering
 - **Prompt Engineering** - Structured JSON output from GPT-4o-mini for reliable parsing
 - **Multi-API Orchestration** - Coordinating 4 external APIs in a single user flow
-- **Cost Optimization** - Model selection, token reduction, caching strategies
+- **Cost Optimization** - Model selection, budget controls, feature flags
 - **Error Handling** - Graceful degradation when AI services are unavailable
 - **Feature Flags** - Production safety with instant disable capability
 
@@ -253,7 +252,7 @@ This project showcases production-ready development practices:
 - **URL State Management** - Shareable filter states via search params
 
 ### Professional Practices
-- **Test-Driven Development** - 130+ tests written before implementation
+- **Test-Driven Development** - 199 tests written before implementation
 - **Accessibility** - WCAG AA compliance, semantic HTML, keyboard navigation
 - **TypeScript Strict Mode** - Full type safety with no `any` types
 - **Security First** - SQL injection protection, XSS prevention, RLS policies

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { redirect } from 'next/navigation'
 import { Header } from '@/components/Header'
 import { createClient } from '@/lib/supabase/server'
+import FeedbackButton from '@/components/FeedbackButton'
 
 interface AppLayoutProps {
   children: ReactNode
@@ -25,6 +26,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
     <div className="min-h-screen bg-gray-50">
       <Header onLogout={logoutAction} />
       <main>{children}</main>
+      {/* Floating feedback button for pilot testing - sends to Formspree */}
+      <FeedbackButton />
     </div>
   )
 }
