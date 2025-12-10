@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { getRecommendationsAction, generateCustomRouteAction } from './actions'
+import { getRecommendationsAction, generateCustomRouteAction, saveGeneratedWalkAction } from './actions'
 import { WalkRecommendation } from '@/lib/ai/openai'
 import CustomRouteForm, { CustomRouteFormData } from '@/components/CustomRouteForm'
 import RouteMap from '@/components/RouteMap'
@@ -38,6 +38,8 @@ export default function RecommendationsClient() {
   const [customRoute, setCustomRoute] = useState<RouteRecommendation | null>(null)
   const [lastFormData, setLastFormData] = useState<CustomRouteFormData | null>(null)
   const [isPending, startTransition] = useTransition()
+  const [isSaving, setIsSaving] = useState(false)
+  const [isSaved, setIsSaved] = useState(false)
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -64,6 +66,8 @@ export default function RecommendationsClient() {
   async function handleCustomRouteSubmit(data: CustomRouteFormData) {
     // Store the form data for "Show Me Another" functionality
     setLastFormData(data)
+    // Reset saved state when generating a new route
+    setIsSaved(false)
     
     startTransition(async () => {
       try {
@@ -89,6 +93,25 @@ export default function RecommendationsClient() {
     
     // Re-submit with same data - AI will generate a different route
     handleCustomRouteSubmit(lastFormData)
+  }
+
+  /**
+   * Save the current AI-generated route as a walk in the database
+   */
+  async function handleSaveWalk() {
+    if (!customRoute || isSaving || isSaved) return
+
+    setIsSaving(true)
+    try {
+      await saveGeneratedWalkAction(customRoute)
+      setIsSaved(true)
+      toast.success('Walk saved successfully!')
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to save walk'
+      toast.error(message)
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
@@ -275,7 +298,15 @@ export default function RecommendationsClient() {
               >
                 {isPending ? 'Generating...' : '🔄 Show Me Another'}
               </button>
-              {/* TODO: Add "Save as Walk" button here */}
+              <button
+                onClick={handleSaveWalk}
+                disabled={isSaving || isSaved}
+                className="flex-1 rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white 
+                  hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed
+                  focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition"
+              >
+                {isSaving ? '💾 Saving...' : isSaved ? '✅ Saved!' : '💾 Save Walk'}
+              </button>
             </div>
 
             {/* Map Display */}

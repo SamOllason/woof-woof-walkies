@@ -172,12 +172,6 @@ Development plan for Woof Woof Walkies - prioritized by learning value and emplo
     - [x] Numbered waypoint list
     - [x] Turn-by-turn directions with HTML formatting
 
-**Note on Local Development:**
-- OpenAI API calls fail locally due to network blocking (`ECONNRESET` errors)
-- Google Maps APIs work fine locally
-- Solution: Deploy to Vercel for testing (network issues don't occur in production)
-- Alternative: Add `OPENAI_MOCK_MODE=true` to `.env.local` for offline development
-
 - [x] **Step 9: Visual Map Display**
   - [x] Install Google Maps React library (`@vis.gl/react-google-maps`)
   - [x] Create `src/components/RouteMap.tsx` following TDD approach

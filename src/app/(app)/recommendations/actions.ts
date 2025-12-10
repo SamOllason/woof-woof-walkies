@@ -3,6 +3,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { generateWalkRecommendations, generateCustomRoute, WalkRecommendation, RoutePreferences } from '@/lib/ai/openai'
 import type { RouteRecommendation } from '@/types/maps'
+import type { Walk } from '@/types/walk'
+import { parseDistance, calculateDifficulty, formatDuration } from '@/lib/utils/walkConversion'
 
 export async function getRecommendationsAction(
   location: string
@@ -88,4 +90,54 @@ export async function generateCustomRouteAction(
     // Error is already user-friendly from the utility function
     throw error
   }
+}
+
+/**
+ * Server Action to save an AI-generated route as a walk
+ * 
+ * Converts RouteRecommendation data to Walk format and saves to database.
+ * Uses utility functions for data transformation (parseDistance, calculateDifficulty, formatDuration).
+ */
+export async function saveGeneratedWalkAction(route: RouteRecommendation): Promise<Walk> {
+  // Validate user is authenticated
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    throw new Error('You must be logged in to save walks')
+  }
+
+  // Convert route data to walk format using utility functions
+  const distanceKm = parseDistance(route.estimatedDistance)
+  
+  // Calculate duration: use directions if available, otherwise estimate from distance
+  // Average walking speed ~5km/h = 12 min per km
+  const durationMinutes = route.directions 
+    ? formatDuration(route.directions.duration)
+    : Math.round(distanceKm * 12)
+
+  const walkData = {
+    name: route.routeName,
+    distance_km: distanceKm,
+    duration_minutes: durationMinutes,
+    difficulty: calculateDifficulty(distanceKm),
+    notes: route.highlights || '',
+    user_id: user.id,
+  }
+
+  // Insert into database
+  const { data, error } = await supabase
+    .from('walks')
+    .insert(walkData)
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error saving walk:', error)
+    throw new Error('Failed to save walk: ' + error.message)
+  }
+
+  return data as Walk
 }
