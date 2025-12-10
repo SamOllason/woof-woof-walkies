@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { getRecommendationsAction, generateCustomRouteAction, saveGeneratedWalkAction } from './actions'
+import { getRecommendationsAction, generateCustomRouteAction, saveGeneratedWalkAction, saveBasicRecommendationAction } from './actions'
 import { WalkRecommendation } from '@/lib/ai/openai'
 import CustomRouteForm, { CustomRouteFormData } from '@/components/CustomRouteForm'
 import RouteMap from '@/components/RouteMap'
@@ -42,6 +42,11 @@ export default function RecommendationsClient() {
   const [isSaved, setIsSaved] = useState(false)
   const [showEmojiRain, setShowEmojiRain] = useState(false)
   const [isWiggling, setIsWiggling] = useState(false)
+  
+  // State for basic recommendation saves - track by index which ones are saved/wiggling
+  const [basicSavingIndex, setBasicSavingIndex] = useState<number | null>(null)
+  const [basicSavedIndexes, setBasicSavedIndexes] = useState<Set<number>>(new Set())
+  const [basicWigglingIndex, setBasicWigglingIndex] = useState<number | null>(null)
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -56,6 +61,8 @@ export default function RecommendationsClient() {
         const results = await getRecommendationsAction(location)
         setRecommendations(results)
         setCustomRoute(null) // Clear custom route when getting basic recommendations
+        // Reset saved state for new recommendations
+        setBasicSavedIndexes(new Set())
         toast.success(`Found ${results.length} recommendations!`)
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Failed to get recommendations'
@@ -124,6 +131,37 @@ export default function RecommendationsClient() {
         toast.error(message)
       } finally {
         setIsSaving(false)
+      }
+    }, 2000)
+  }
+
+  /**
+   * Save a basic AI recommendation as a walk in the database
+   * Easter egg: Button wiggles like a happy dog, then emoji rain! 🐕
+   */
+  async function handleSaveBasicRecommendation(recommendation: WalkRecommendation, index: number) {
+    if (basicSavedIndexes.has(index) || basicSavingIndex !== null || basicWigglingIndex !== null) return
+
+    // Start the wiggle animation (like an excited dog!)
+    setBasicWigglingIndex(index)
+    
+    // Wait for wiggle to complete (2 seconds), then save
+    setTimeout(async () => {
+      setBasicWigglingIndex(null)
+      setBasicSavingIndex(index)
+      
+      try {
+        await saveBasicRecommendationAction(recommendation, location)
+        setBasicSavedIndexes(prev => new Set(prev).add(index))
+        // Trigger emoji rain celebration! 🎉
+        setShowEmojiRain(true)
+        setTimeout(() => setShowEmojiRain(false), 3000)
+        toast.success('Walk saved successfully!')
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Failed to save walk'
+        toast.error(message)
+      } finally {
+        setBasicSavingIndex(null)
       }
     }, 2000)
   }
@@ -215,40 +253,61 @@ export default function RecommendationsClient() {
             Recommended Walks for {location}
           </h2>
           
-          {recommendations.map((rec, index) => (
-            <div
-              key={index}
-              className="rounded-lg border border-gray-200 bg-white p-4 sm:p-6 shadow-sm"
-            >
-              <div className="mb-4">
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
-                  {rec.name}
-                </h3>
-                <div className="mt-1 flex flex-wrap gap-2 sm:gap-4 text-sm text-gray-600">
-                  <span>📏 {rec.distance}</span>
-                  <span>
-                    {rec.difficulty === 'easy' && '🟢'}
-                    {rec.difficulty === 'moderate' && '🟡'}
-                    {rec.difficulty === 'hard' && '🔴'}
-                    {' '}
-                    {rec.difficulty.charAt(0).toUpperCase() + rec.difficulty.slice(1)}
-                  </span>
+          {recommendations.map((rec, index) => {
+            const isThisWiggling = basicWigglingIndex === index
+            const isThisSaving = basicSavingIndex === index
+            const isThisSaved = basicSavedIndexes.has(index)
+            const isAnyBusy = basicWigglingIndex !== null || basicSavingIndex !== null
+            
+            return (
+              <div
+                key={index}
+                className="rounded-lg border border-gray-200 bg-white p-4 sm:p-6 shadow-sm"
+              >
+                <div className="mb-4">
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
+                    {rec.name}
+                  </h3>
+                  <div className="mt-1 flex flex-wrap gap-2 sm:gap-4 text-sm text-gray-600">
+                    <span>📏 {rec.distance}</span>
+                    <span>
+                      {rec.difficulty === 'easy' && '🟢'}
+                      {rec.difficulty === 'moderate' && '🟡'}
+                      {rec.difficulty === 'hard' && '🔴'}
+                      {' '}
+                      {rec.difficulty.charAt(0).toUpperCase() + rec.difficulty.slice(1)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <h4 className="mb-1 font-semibold text-gray-700">Highlights</h4>
+                    <p className="text-gray-600">{rec.highlights}</p>
+                  </div>
+
+                  <div>
+                    <h4 className="mb-1 font-semibold text-gray-700">Why this route?</h4>
+                    <p className="text-gray-600">{rec.reason}</p>
+                  </div>
+                </div>
+
+                {/* Save Button with wiggle animation */}
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <button
+                    onClick={() => handleSaveBasicRecommendation(rec, index)}
+                    disabled={isThisSaving || isThisSaved || (isAnyBusy && !isThisWiggling)}
+                    className={`w-full sm:w-auto rounded-lg bg-blue-600 px-4 sm:px-6 py-2 font-semibold text-white 
+                      hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed
+                      focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition
+                      ${isThisWiggling ? 'animate-wiggle' : ''}`}
+                  >
+                    {isThisWiggling ? '🐕 Wiggle wiggle...' : isThisSaving ? '💾 Saving...' : isThisSaved ? '✅ Saved!' : '💾 Save Walk'}
+                  </button>
                 </div>
               </div>
-
-              <div className="space-y-3">
-                <div>
-                  <h4 className="mb-1 font-semibold text-gray-700">Highlights</h4>
-                  <p className="text-gray-600">{rec.highlights}</p>
-                </div>
-
-                <div>
-                  <h4 className="mb-1 font-semibold text-gray-700">Why this route?</h4>
-                  <p className="text-gray-600">{rec.reason}</p>
-                </div>
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
 

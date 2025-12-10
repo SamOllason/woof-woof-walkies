@@ -141,3 +141,61 @@ export async function saveGeneratedWalkAction(route: RouteRecommendation): Promi
 
   return data as Walk
 }
+
+/**
+ * Server Action to save a basic AI recommendation as a walk
+ * 
+ * Converts WalkRecommendation (basic AI recommendation) to Walk format and saves to database.
+ * Basic recommendations have less detailed data than custom routes.
+ */
+export async function saveBasicRecommendationAction(
+  recommendation: WalkRecommendation, 
+  location: string
+): Promise<Walk> {
+  // Validate user is authenticated
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    throw new Error('You must be logged in to save walks')
+  }
+
+  // Convert basic recommendation data to walk format
+  const distanceKm = parseDistance(recommendation.distance)
+  
+  // Estimate duration from distance (~5km/h = 12 min per km)
+  const durationMinutes = Math.round(distanceKm * 12)
+
+  // Map basic difficulty to our DifficultyLevel type
+  const difficultyMap: Record<string, 'easy' | 'moderate' | 'hard'> = {
+    easy: 'easy',
+    moderate: 'moderate',
+    hard: 'hard',
+  }
+  const difficulty = difficultyMap[recommendation.difficulty] || 'moderate'
+
+  const walkData = {
+    name: recommendation.name,
+    distance_km: distanceKm,
+    duration_minutes: durationMinutes,
+    difficulty: difficulty,
+    notes: `Location: ${location}\n\nHighlights: ${recommendation.highlights}\n\nWhy this route: ${recommendation.reason}`,
+    user_id: user.id,
+  }
+
+  // Insert into database
+  const { data, error } = await supabase
+    .from('walks')
+    .insert(walkData)
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error saving basic recommendation:', error)
+    throw new Error('Failed to save walk: ' + error.message)
+  }
+
+  return data as Walk
+}
