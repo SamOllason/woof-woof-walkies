@@ -116,21 +116,21 @@ export default function RecommendationsClient() {
 
   return (
     <div className="mx-auto max-w-4xl">
-      <div className="mb-8">
-        <h1 className="mb-2 text-3xl font-bold text-gray-900">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="mb-2 text-2xl sm:text-3xl font-bold text-gray-900">
           ✨ AI Walk Recommendations
         </h1>
-        <p className="text-gray-600">
+        <p className="text-sm sm:text-base text-gray-600">
           Get personalized dog walking route suggestions for any location
         </p>
       </div>
 
-      {/* Mode Toggle */}
-      <div className="mb-6 flex gap-2 rounded-lg bg-gray-100 p-1">
+      {/* Mode Toggle - stacks on very small screens */}
+      <div className="mb-6 flex flex-col sm:flex-row gap-2 rounded-lg bg-gray-100 p-1">
         <button
           type="button"
           onClick={() => setMode('basic')}
-          className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition ${
+          className={`flex-1 rounded-md px-3 sm:px-4 py-2 text-sm font-medium transition ${
             mode === 'basic'
               ? 'bg-white text-gray-900 shadow'
               : 'text-gray-600 hover:text-gray-900'
@@ -141,7 +141,7 @@ export default function RecommendationsClient() {
         <button
           type="button"
           onClick={() => setMode('custom')}
-          className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition ${
+          className={`flex-1 rounded-md px-3 sm:px-4 py-2 text-sm font-medium transition ${
             mode === 'custom'
               ? 'bg-white text-gray-900 shadow'
               : 'text-gray-600 hover:text-gray-900'
@@ -153,13 +153,13 @@ export default function RecommendationsClient() {
 
       {/* Basic Recommendations Form */}
       {mode === 'basic' && (
-        <form onSubmit={handleSubmit} className="mb-8">
-          <div className="flex gap-4">
+        <form onSubmit={handleSubmit} className="mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <input
               type="text"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              placeholder="Enter a location (e.g., London, SW1A 1AA, Hyde Park)"
+              placeholder="Enter a location (e.g., London, Hyde Park)"
               className="flex-1 rounded-lg border border-gray-300 px-4 py-2 
                 text-gray-900 placeholder:text-gray-500
                 focus:border-transparent focus:ring-2 focus:ring-blue-500"
@@ -168,10 +168,10 @@ export default function RecommendationsClient() {
             <button
               type="submit"
               disabled={isPending}
-              className="rounded-lg bg-blue-600 px-6 py-2 font-semibold text-white 
+              className="w-full sm:w-auto rounded-lg bg-blue-600 px-6 py-2 font-semibold text-white 
                 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              {isPending ? 'Finding walks...' : 'Get Recommendations'}
+              {isPending ? 'Finding...' : 'Get Recommendations'}
             </button>
           </div>
         </form>
@@ -179,7 +179,7 @@ export default function RecommendationsClient() {
 
       {/* Custom Route Form */}
       {mode === 'custom' && (
-        <div className="mb-8 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="mb-6 sm:mb-8 rounded-lg border border-gray-200 bg-white p-4 sm:p-6 shadow-sm">
           <CustomRouteForm onSubmit={handleCustomRouteSubmit} isLoading={isPending} />
         </div>
       )}
@@ -196,31 +196,29 @@ export default function RecommendationsClient() {
 
       {/* Basic Recommendations Results */}
       {!isPending && mode === 'basic' && recommendations.length > 0 && (
-        <div className="space-y-6">
-          <h2 className="text-xl font-semibold text-gray-900">
+        <div className="space-y-4 sm:space-y-6">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
             Recommended Walks for {location}
           </h2>
           
           {recommendations.map((rec, index) => (
             <div
               key={index}
-              className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm"
+              className="rounded-lg border border-gray-200 bg-white p-4 sm:p-6 shadow-sm"
             >
-              <div className="mb-4 flex items-start justify-between">
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900">
-                    {rec.name}
-                  </h3>
-                  <div className="mt-1 flex gap-4 text-sm text-gray-600">
-                    <span>📏 {rec.distance}</span>
-                    <span>
-                      {rec.difficulty === 'easy' && '🟢'}
-                      {rec.difficulty === 'moderate' && '🟡'}
-                      {rec.difficulty === 'hard' && '🔴'}
-                      {' '}
-                      {rec.difficulty.charAt(0).toUpperCase() + rec.difficulty.slice(1)}
-                    </span>
-                  </div>
+              <div className="mb-4">
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
+                  {rec.name}
+                </h3>
+                <div className="mt-1 flex flex-wrap gap-2 sm:gap-4 text-sm text-gray-600">
+                  <span>📏 {rec.distance}</span>
+                  <span>
+                    {rec.difficulty === 'easy' && '🟢'}
+                    {rec.difficulty === 'moderate' && '🟡'}
+                    {rec.difficulty === 'hard' && '🔴'}
+                    {' '}
+                    {rec.difficulty.charAt(0).toUpperCase() + rec.difficulty.slice(1)}
+                  </span>
                 </div>
               </div>
 
@@ -242,20 +240,20 @@ export default function RecommendationsClient() {
 
       {/* Custom Route Results */}
       {!isPending && mode === 'custom' && customRoute && (
-        <div className="space-y-6">
-          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="space-y-4 sm:space-y-6">
+          <div className="rounded-lg border border-gray-200 bg-white p-4 sm:p-6 shadow-sm">
             {/* Route Header */}
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <div className="mb-4 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
                 {customRoute.routeName}
               </h2>
-              <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+              <div className="flex flex-wrap gap-2 sm:gap-4 text-sm text-gray-600">
                 <span>📏 {customRoute.estimatedDistance}</span>
                 {customRoute.directions && (
                   <span>⏱️ {Math.round(customRoute.directions.duration / 60)} min</span>
                 )}
               </div>
-              <p className="mt-3 text-gray-700">{customRoute.highlights}</p>
+              <p className="mt-3 text-sm sm:text-base text-gray-700">{customRoute.highlights}</p>
             </div>
 
             {/* Waypoints */}
@@ -288,11 +286,11 @@ export default function RecommendationsClient() {
             </div>
 
              {/* Action Buttons */}
-            <div className="flex gap-3 pt-4 border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
               <button
                 onClick={handleShowMeAnother}
                 disabled={isPending}
-                className="flex-1 rounded-lg bg-white border-2 border-blue-600 px-6 py-3 font-semibold text-blue-600 
+                className="flex-1 rounded-lg bg-white border-2 border-blue-600 px-4 sm:px-6 py-3 font-semibold text-blue-600 
                   hover:bg-blue-50 disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed
                   focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition"
               >
@@ -301,7 +299,7 @@ export default function RecommendationsClient() {
               <button
                 onClick={handleSaveWalk}
                 disabled={isSaving || isSaved}
-                className="flex-1 rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white 
+                className="flex-1 rounded-lg bg-blue-600 px-4 sm:px-6 py-3 font-semibold text-white 
                   hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed
                   focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition"
               >
@@ -310,13 +308,13 @@ export default function RecommendationsClient() {
             </div>
 
             {/* Map Display */}
-            <div className="mb-6">
+            <div className="mb-4 sm:mb-6">
               <h3 className="font-semibold text-gray-900 mb-3">Route Map</h3>
               
               <RouteMap 
                 waypoints={customRoute.waypoints} 
                 directions={customRoute.directions}
-                height="500px" 
+                height="350px" 
               />
             </div>
 
