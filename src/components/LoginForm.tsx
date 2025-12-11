@@ -72,10 +72,10 @@ export function LoginForm({ onLogin }: LoginFormProps) {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="text-center text-3xl font-bold text-gray-900">
-            🐾 Welcome back
+            🐾 Welcome back to Route Sniffer
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Log in to continue tracking your walkies
+            Log in to continue sniffing out new routes
           </p>
         </div>
 
